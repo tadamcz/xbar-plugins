@@ -14,5 +14,5 @@ echo $VAR_MENU_BAR_TEXT
 echo "---"
 while read -r line; do
     # add `| font='MesloLGL Nerd Font Mono'` to every line
-    echo "$line" " | font='MesloLGL Nerd Font Mono'"
+    echo "$line" " | font='MesloLGL Nerd Font Mono' size=10"
 done < <(/usr/local/bin/docker stats --no-stream)
