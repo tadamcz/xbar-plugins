@@ -16,4 +16,3 @@ while read -r line; do
     # add `| font='MesloLGL Nerd Font Mono'` to every line
     echo "$line" " | font='MesloLGL Nerd Font Mono'"
 done < <(/usr/local/bin/docker stats --no-stream)
-echo "Refresh | terminal=false refresh=true"
