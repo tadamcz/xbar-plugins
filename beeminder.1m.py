@@ -31,10 +31,6 @@ retries = Retry(total=10, backoff_factor=0.1)
 s = requests.Session()
 s.mount('https://', HTTPAdapter(max_retries=retries))
 
-# Get data
-if not USERNAME or not AUTH_TOKEN:
-    print('⚠️\n---\nBeeminder: No username and/or auth token provided!')
-    exit(1)
 API_URL = 'https://www.beeminder.com/api/v1/users/{}.json'.format(USERNAME)
 
 
