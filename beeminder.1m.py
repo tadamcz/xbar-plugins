@@ -21,6 +21,7 @@ import time
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from urllib.error import URLError
+from datetime import datetime
 
 # Script-level variables
 AUTH_TOKEN = os.environ["VAR_AUTH_TOKEN"]
@@ -56,6 +57,7 @@ for i in range(retries):
         data = json.loads(response.read())
         goals = data['goals']
         resolved_username = data['username']
+        response_datetime = datetime.now()
         break
     except URLError as e:
         if i < retries - 1:
@@ -89,4 +91,5 @@ output = []
 output.append(f"{goal_emoji}{color_emoji}{message}")  # Shown in menu bar
 output.append("---")
 output.append(f"{goal_url} | href={goal_url}")  # Shown in dropdown
+output.append(f"Last updated: {response_datetime.strftime('%a %b %d %Y @ %H:%M:%S')}")
 print("\n".join(output))
