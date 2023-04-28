@@ -10,9 +10,19 @@
 #  <xbar.image>https://images2.imgbox.com/e6/1a/3AEpT9sd_o.png</xbar.image>
 #  <xbar.var>string(VAR_MENU_BAR_TEXT='🐳'): The text that will appear in the Menu Bar</xbar.var>
 
+DOCKER=~/.docker/bin/docker
+
+if ! $DOCKER --version >/dev/null 2>&1; then
+    echo ⚠️$VAR_MENU_BAR_TEXT
+    echo ---
+    echo "Could not find docker binary at $DOCKER"
+    exit
+fi
+
 echo $VAR_MENU_BAR_TEXT
 echo "---"
+
 while read -r line; do
     # add `| font='MesloLGL Nerd Font Mono'` to every line
     echo "$line" " | font='MesloLGL Nerd Font Mono' size=10"
-done < <(/usr/local/bin/docker stats --no-stream)
+done < <($DOCKER stats --no-stream)
