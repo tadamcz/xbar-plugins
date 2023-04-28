@@ -22,7 +22,15 @@ fi
 echo $VAR_MENU_BAR_TEXT
 echo "---"
 
+DOCKER_STATS=$($DOCKER stats --no-stream)
+
+# If exit code is 1, the daemon is not running
+if [ $? -eq 1 ]; then
+    echo "Docker daemon is not running"
+    exit
+fi
+
+# Loop through each line of the docker stats output
 while read -r line; do
-    # add `| font='MesloLGL Nerd Font Mono'` to every line
-    echo "$line" " | font='MesloLGL Nerd Font Mono' size=10"
-done < <($DOCKER stats --no-stream)
+    echo "$line" " | font='MesloLGL Nerd Font Mono' size=10"  # add `| font='MesloLGL Nerd Font Mono'`
+done <<< "$DOCKER_STATS"
