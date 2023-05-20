@@ -15,27 +15,20 @@
 # <xbar.var>string(VAR_GOAL_SLUG='exercise'): Your Beeminder goal slug e.g. 'exercise' for beeminder.com/myusername/exercise</xbar.var>
 # <xbar.var>string(VAR_GOAL_EMOJI='🏋️'): Emoji to represent your goal (will appear in the menu bar)</xbar.var>
 
-import os
 import json
+import os
 import time
-from urllib.request import urlopen, Request
-from urllib.parse import urlencode
-from urllib.error import URLError
 from datetime import datetime
+from urllib.error import URLError
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 # Script-level variables
 AUTH_TOKEN = os.environ["VAR_AUTH_TOKEN"]
-GOAL_SLUG = os.environ["VAR_GOAL_SLUG"]
-GOAL_EMOJI = os.environ["VAR_GOAL_EMOJI"]
 
 # Check variables
 if not AUTH_TOKEN:
     raise Exception("Please set your Beeminder auth token in the script variables")
-if not GOAL_SLUG:
-    raise Exception("Please set your Beeminder goal slug in the script variables")
-if not GOAL_EMOJI:
-    raise Exception("Please set your goal emoji in the script variables")
-
 
 # Get data
 
@@ -43,7 +36,6 @@ if not GOAL_EMOJI:
 API_URL = f'https://www.beeminder.com/api/v1/users/me.json'
 params = dict(auth_token=AUTH_TOKEN, datapoints_count=1, associations=True)
 url_with_params = f'{API_URL}?{urlencode(params)}'
-
 
 retries = 13
 backoff_factor = 0.1
@@ -66,30 +58,57 @@ for i in range(retries):
         else:
             raise Exception(f'Error fetching data: {e}')
 
-# Select goal
-goal_emoji = GOAL_EMOJI
-goal_slug = GOAL_SLUG
-chinups = next(filter(lambda goal: goal['slug'] == goal_slug, goals))
-goal = chinups
+# Select goals
+chinup = next(filter(lambda goal: goal['slug'] == 'chinup', goals))
+pushup = next(filter(lambda goal: goal['slug'] == 'pushup', goals))
 
-# Assemble output
 color_emojis = {
     "green": "🟢",
     "blue": "🔵",
     "orange": "🟠",
     "red": "🔴",
 }
+goal_emojis = {
+    "chinup": "️:muscle:",
+    "pushup": ":raised_hands:",
+}
+goals = [chinup, pushup]
 
-goal_url = f'https://www.beeminder.com/{resolved_username}/{goal["slug"]}'
-color_emoji = color_emojis[goal["roadstatuscolor"]]
-message = goal['limsumdays']
 
-# Abbreviate message to take up less space in menu bar
-message = message.replace("due ", "").replace("days", "d").replace("day", "d")
+def menu_bar(goals):
+    output = ""
+    for goal in goals:
+        goal_slug = goal["slug"]
+        goal_emoji = goal_emojis[goal_slug]
+        color_emoji = color_emojis[goal["roadstatuscolor"]]
+        output += f'{goal_emoji}{color_emoji}'
+    return output
 
-output = []
-output.append(f"{goal_emoji}{color_emoji}{message}")  # Shown in menu bar
-output.append("---")
-output.append(f"{goal_url} | href={goal_url}")  # Shown in dropdown
-output.append(f"Last updated: {response_datetime.strftime('%a %b %d %Y @ %H:%M:%S')}")
-print("\n".join(output))
+
+def dropdown(goals):
+    output = []
+    for goal in goals:
+        goal_slug = goal["slug"]
+        goal_emoji = goal_emojis[goal_slug]
+        color_emoji = color_emojis[goal["roadstatuscolor"]]
+        message = goal['limsumdays']
+
+        goal_url = f'https://www.beeminder.com/{resolved_username}/{goal["slug"]}'
+
+        goal_lines = [
+            "---",
+            f"{goal_slug}",
+            f'{goal_emoji} {color_emoji} {message}',
+            f"{goal_url} | href={goal_url}",
+        ]
+
+        output.extend(goal_lines)
+
+    return output
+
+
+print(menu_bar(goals))
+print("---")
+print("\n".join(dropdown(goals)))
+print("---")
+print(f"Last updated: {response_datetime.strftime('%a %b %d %Y @ %H:%M:%S')}")  # xbar hangs sometimes
