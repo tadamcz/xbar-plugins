@@ -30,7 +30,7 @@ UPTIME_STATUS=$(echo $RESPONSE | $JQ_PATH -r '.Uptime_Status')
 
 # Displaying appropriate icon based on Uptime Status
 if [[ "$UPTIME_STATUS" == "Online" ]]; then
-    echo "✨"
+    echo "🆙"
 else
     echo "❗️"
     echo "---"
