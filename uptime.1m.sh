@@ -31,8 +31,11 @@ UPTIME_STATUS=$(echo $RESPONSE | $JQ_PATH -r '.Uptime_Status')
 # Displaying appropriate icon based on Uptime Status
 if [[ "$UPTIME_STATUS" == "Online" ]]; then
     echo "🆙"
+    echo "---"
+    echo "Open Hetrix report | href=https://hetrixtools.com/report/uptime/$REPORT_ID/"
 else
     echo "❗️"
     echo "---"
     echo $UPTIME_STATUS
+    echo "Open Hetrix report | href=https://hetrixtools.com/report/uptime/$REPORT_ID/"
 fi
